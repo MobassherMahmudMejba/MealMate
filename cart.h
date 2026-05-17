@@ -1,11 +1,17 @@
+// cart.h — Day 3: Cart Management Function Declarations
 #ifndef CART_H
 #define CART_H
+
 #include "structs.h"
 
-void clearCart(CartItem cart[], int *itemCount);
-int addToCart(CartItem cart[], int *itemCount, MenuItem menu[], int menuCount, int dishId, int qty);
-int removeFromCart(CartItem cart[], int *itemCount, int dishId);
-void viewCart(CartItem cart[], int itemCount);
-float calculateTotal(CartItem cart[], int itemCount);
+// ফাংশন ডিক্লেয়ারেশন
+void addToCart(MenuItem item, int qty);
+void removeFromCart(int index);
+void viewCart();
+float calculateTotal();
+void clearCart();
+
+int getCartItemCount();
+CartItem* getCartItems();
 
 #endif

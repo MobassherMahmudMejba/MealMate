@@ -34,8 +34,37 @@ int main() {
 
     CartItem myCart[10];
     int cartItemCount = 0;
-    addToCart(myCart, &cartItemCount, globalMenu, menuCount, 2, 2); // Khichuri
-    addToCart(myCart, &cartItemCount, globalMenu, menuCount, 4, 5); // Singara
+    // Khichuri (ID 2) খুঁজে বের করে কার্টে যোগ করা
+    MenuItem item1;
+    int found1 = 0;
+    for (int i = 0; i < menuCount; i++) {
+        if (globalMenu[i].id == 2) {
+            item1 = globalMenu[i];
+            found1 = 1;
+            break;
+        }
+    }
+    if (found1) {
+        addToCart(item1, 2); // Khichuri যোগ হবে ২টা
+    } else {
+        printf("[!] Test Error: Khichuri (ID 2) not found in menu.txt\n");
+    }
+
+    // Singara (ID 4) খুঁজে বের করে কার্টে যোগ করা
+    MenuItem item2;
+    int found2 = 0;
+    for (int i = 0; i < menuCount; i++) {
+        if (globalMenu[i].id == 4) {
+            item2 = globalMenu[i];
+            found2 = 1;
+            break;
+        }
+    }
+    if (found2) {
+        addToCart(item2, 5); // Singara যোগ হবে ৫টা
+    } else {
+        printf("[!] Test Error: Singara (ID 4) not found in menu.txt\n");
+    }
     viewCart(myCart, cartItemCount);
 
     float totalCost = calculateTotal(myCart, cartItemCount);
