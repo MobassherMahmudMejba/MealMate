@@ -68,8 +68,8 @@ int main() {
     viewCart(myCart, cartItemCount);
 
     float totalCost = calculateTotal(myCart, cartItemCount);
-    placeOrder("252-35-999", myCart, cartItemCount, totalCost);
-    displayOrderHistory("252-35-999");
+    placeOrder("252-35-316"); // এখানে তোমার আইডি বা যেকোনো স্টুডেন্ট আইডি পাস করো
+    displayOrderHistory("252-35-316");
 
     printf("\n>>> LOCAL TEST PASSED: SYSTEM WORKING PERFECTLY! <<<\n");
     return 0;
