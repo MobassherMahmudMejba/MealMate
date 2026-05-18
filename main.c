@@ -13,10 +13,10 @@ void autoFixMenuFile() {
     FILE *f = fopen("data/menu.txt", "w");
     if (f != NULL) {
         fprintf(f, "1|Paratha with Egg|Breakfast|25.00|50|Fresh paratha with fried egg|1\n");
-        fprintf(f, "2|Khichuri|Lunch|40.00|30|Classic Bengali khichuri|1\n");
+        fprintf(f, "2|Classic Bengali Khichuri|Lunch|40.00|30|Classic Bengali khichuri|1\n");
         fprintf(f, "3|Chicken Fried Rice|Lunch|60.00|25|Wok rice with chicken|1\n");
-        fprintf(f, "4|Singara|Snack|10.00|100|Crispy fried singara|1\n");
-        fprintf(f, "5|Halim|Lunch|50.00|20|Spicy beef halim|1\n");
+        fprintf(f, "4|Crispy fried Singara|Snack|10.00|100|Crispy fried singara|1\n");
+        fprintf(f, "5|Spicy beef Halim|Lunch|50.00|20|Spicy beef halim|1\n");
         fclose(f);
     }
 }
@@ -25,43 +25,110 @@ int main() {
     srand(time(NULL));
     autoFixMenuFile(); 
 
-    printf(">>> FRESH START: MEALMATE SYSTEM INTERACTIVE TEST <<<\n");
     MenuItem globalMenu[50];
     int menuCount = loadMenu(globalMenu, 50);
-    printf("[1] Loaded %d items from menu.txt\n", menuCount);
-    displayAllMenu(globalMenu, menuCount);
 
-    registerUser("252-35-999", "mejba123", "Mejba Mahmud");
-    saveWallet("252-35-999", 500.00); 
-
-    MenuItem item1; int found1 = 0;
-    for (int i = 0; i < menuCount; i++) {
-        if (globalMenu[i].id == 2) { item1 = globalMenu[i]; found1 = 1; break; }
-    }
-    if (found1) addToCart(item1, 2);
-
-    MenuItem item2; int found2 = 0;
-    for (int i = 0; i < menuCount; i++) {
-        if (globalMenu[i].id == 4) { item2 = globalMenu[i]; found2 = 1; break; }
-    }
-    if (found2) addToCart(item2, 5);
-
-    viewCart();
-    float totalCost = calculateTotal();
-    
-    placeOrder("252-35-316"); 
-    displayOrderHistory("252-35-316");
-
-    printf("\n>>> DAY 4 INTEGRATION TESTING START <<<\n");
+    // সেশন ট্র্যাকিংয়ের জন্য ডিফল্ট স্টুডেন্ট আইডি ও ওয়ালেট ইনিশিয়ালাইজেশন
     char currentStudent[] = "252-35-316"; 
-    int currentOrder = 2113; 
+    registerUser(currentStudent, "mejba123", "Mejba Mahmud");
+    saveWallet(currentStudent, 500.00); 
 
-    submitFeedback(currentStudent, currentOrder);
-    viewMyFeedback(currentStudent);
-    reportIssue(currentStudent);
-    viewMyTickets(currentStudent);
+    int choice;
+    while (1) {
+        printf("\n=====================================================\n");
+        printf("             CAMPUS MEALMATE DASHBOARD               \n");
+        printf("         Logged in as Student ID: %s                 \n", currentStudent);
+        printf("=====================================================\n");
+        printf("[1] View Cafeteria Menu\n");
+        printf("[2] Add Item to Cart\n");
+        printf("[3] View Cart & Checkout\n");
+        printf("[4] View Order History\n");
+        printf("[5] Submit Feedback for an Order\n");
+        printf("[6] View My Submitted Feedback\n");
+        printf("[7] Report an Issue (Support Ticket)\n");
+        printf("[8] View My Support Tickets\n");
+        printf("[0] Exit Application\n");
+        printf("-----------------------------------------------------\n");
+        printf("Select an option: ");
+        
+        if (scanf("%d", &choice) != 1) {
+            printf("[!] Invalid input format!\n");
+            getchar(); // Clear invalid token
+            continue;
+        }
 
-    printf("\n>>> DAY 4 TESTING COMPLETE <<<\n");
-    printf("\n>>> LOCAL TEST PASSED: SYSTEM WORKING PERFECTLY! <<<\n");
+        switch (choice) {
+            case 1:
+                displayAllMenu(globalMenu, menuCount);
+                break;
+                
+            case 2: {
+                int itemId, qty;
+                printf("\nEnter Item ID to add: ");
+                scanf("%d", &itemId);
+                printf("Enter Quantity: ");
+                scanf("%d", &qty);
+                
+                int found = 0;
+                for (int i = 0; i < menuCount; i++) {
+                    if (globalMenu[i].id == itemId) {
+                        addToCart(globalMenu[i], qty);
+                        found = 1;
+                        break;
+                    }
+                }
+                if (!found) printf("[!] Product ID not found in inventory!\n");
+                break;
+            }
+                
+            case 3: {
+                viewCart();
+                float total = calculateTotal();
+                if (total > 0) {
+                    char confirm;
+                    printf("Proceed to Place Order? (y/n): ");
+                    getchar(); // Clear buffer
+                    scanf("%c", &confirm);
+                    if (confirm == 'y' || confirm == 'Y') {
+                        placeOrder(currentStudent);
+                    } else {
+                        printf("[*] Checkout canceled. Staging buffer preserved.\n");
+                    }
+                }
+                break;
+            }
+                
+            case 4:
+                displayOrderHistory(currentStudent);
+                break;
+                
+            case 5: {
+                int orderId;
+                printf("\nEnter the Order ID you want to rate: ");
+                scanf("%d", &orderId);
+                submitFeedback(currentStudent, orderId);
+                break;
+            }
+                
+            case 6:
+                viewMyFeedback(currentStudent);
+                break;
+                
+            case 7:
+                reportIssue(currentStudent);
+                break;
+                
+            case 8:
+                viewMyTickets(currentStudent);
+                break;
+                
+            case 0:
+                printf("\nClosing session. Thank you for using MealMate!\n");
+                return 0;
+                
+            default:
+                printf("[!] Invalid choice! Please select between 0 and 8.\n");
+        }
+    }
     return 0;
 }
