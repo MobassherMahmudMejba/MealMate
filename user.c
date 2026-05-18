@@ -7,7 +7,25 @@ void registerUser(char* id, char* password, char* name) {
     if (f != NULL) {
         fprintf(f, "%s|%s|%s\n", id, password, name);
         fclose(f);
+        printf("[?] Account registered successfully for %s!\n", name);
     }
+}
+
+int loginUser(char* id, char* password) {
+    FILE *f = fopen("data/users.txt", "r");
+    if (f == NULL) return 0;
+    
+    char line[150], f_id[20], f_pass[20], f_name[50];
+    while (fgets(line, sizeof(line), f)) {
+        if (sscanf(line, "%[^|]|%[^|]|%[^\n]", f_id, f_pass, f_name) == 3) {
+            if (strcmp(f_id, id) == 0 && strcmp(f_pass, password) == 0) {
+                fclose(f);
+                return 1; // Authentication Passed
+            }
+        }
+    }
+    fclose(f);
+    return 0; // Authentication Failed
 }
 
 void saveWallet(char* id, float balance) {
@@ -65,9 +83,9 @@ float getWalletBalance(char* id) {
 
 int deductWalletBalance(char* id, float amount) {
     float currentBal = getWalletBalance(id);
-    if (currentBal < amount) return 0; // Insufficient Balance
+    if (currentBal < amount) return 0; 
     saveWallet(id, currentBal - amount);
-    return 1; // Successful Deduction
+    return 1; 
 }
 
 void addWalletFunds(char* id, float amount) {

@@ -35,18 +35,12 @@ int main() {
     MenuItem globalMenu[50];
     int menuCount = loadMenu(globalMenu, 50);
 
-    char currentStudent[] = "252-35-316"; 
-    registerUser(currentStudent, "mejba123", "Mejba Mahmud");
-    if (getWalletBalance(currentStudent) == 0.0f) {
-        saveWallet(currentStudent, 300.00); 
-    }
-
     int roleChoice;
     while (1) {
         printf("\n=====================================================\n");
         printf("             WELCOME TO CAMPUS MEALMATE              \n");
         printf("=====================================================\n");
-        printf("[1] Student Portal\n");
+        printf("[1] Student Portal (Login / Register)\n");
         printf("[2] Admin / Cafeteria Manager Portal\n");
         printf("[0] Exit System\n");
         printf("-----------------------------------------------------\n");
@@ -74,6 +68,48 @@ int main() {
         }
 
         if (roleChoice == 1) {
+            int subChoice;
+            char currentStudent[20] = "";
+            int isLoggedIn = 0;
+
+            while (!isLoggedIn) {
+                printf("\n--- STUDENT AUTHENTICATION GATEWAY ---\n");
+                printf("[1] Login Existing Account\n");
+                printf("[2] Register New Student Account\n");
+                printf("[0] Back to Main Menu\n");
+                printf("Select option: ");
+                scanf("%d", &subChoice);
+
+                if (subChoice == 0) break;
+
+                if (subChoice == 2) {
+                    char regId[20], regPass[20], regName[50];
+                    printf("\nEnter New Student ID: "); scanf("%s", regId);
+                    printf("Enter Password: "); scanf("%s", regPass);
+                    printf("Enter Full Name: "); getchar(); fgets(regName, sizeof(regName), stdin);
+                    regName[strcspn(regName, "\n")] = 0;
+
+                    registerUser(regId, regPass, regName);
+                    // ???? ??????????? ?????? ??? ???? ???? ????? ??????????? ??? ???
+                    saveWallet(regId, 500.00); 
+                } 
+                else if (subChoice == 1) {
+                    char loginId[20], loginPass[20];
+                    printf("\nEnter Student ID: "); scanf("%s", loginId);
+                    printf("Enter Password: "); scanf("%s", loginPass);
+
+                    if (loginUser(loginId, loginPass)) {
+                        strcpy(currentStudent, loginId);
+                        isLoggedIn = 1;
+                        printf("[?] Authentication Successful! Welcome back.\n");
+                    } else {
+                        printf("[!] ACCESS DENIED: Invalid ID or Password!\n");
+                    }
+                }
+            }
+
+            if (!isLoggedIn) continue; // ????? ???? ?????? ???? ????
+
             int choice;
             while (1) {
                 printf("\n=====================================================\n");
@@ -98,7 +134,7 @@ int main() {
 
                 switch (choice) {
                     case 1:
-                        menuCount = loadMenu(globalMenu, 50); // Reload values from file
+                        menuCount = loadMenu(globalMenu, 50); 
                         displayAllMenu(globalMenu, menuCount);
                         break;
                     case 2: {
