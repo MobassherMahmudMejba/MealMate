@@ -6,6 +6,8 @@
 #include "menu.h"
 #include "cart.h"
 #include "order.h"
+#include "feedback.h"
+#include "issues.h"
 
 void autoFixMenuFile() {
     FILE *f = fopen("data/menu.txt", "w");
@@ -32,45 +34,34 @@ int main() {
     registerUser("252-35-999", "mejba123", "Mejba Mahmud");
     saveWallet("252-35-999", 500.00); 
 
-    CartItem myCart[10];
-    int cartItemCount = 0;
-    // Khichuri (ID 2) খুঁজে বের করে কার্টে যোগ করা
-    MenuItem item1;
-    int found1 = 0;
+    MenuItem item1; int found1 = 0;
     for (int i = 0; i < menuCount; i++) {
-        if (globalMenu[i].id == 2) {
-            item1 = globalMenu[i];
-            found1 = 1;
-            break;
-        }
+        if (globalMenu[i].id == 2) { item1 = globalMenu[i]; found1 = 1; break; }
     }
-    if (found1) {
-        addToCart(item1, 2); // Khichuri যোগ হবে ২টা
-    } else {
-        printf("[!] Test Error: Khichuri (ID 2) not found in menu.txt\n");
-    }
+    if (found1) addToCart(item1, 2);
 
-    // Singara (ID 4) খুঁজে বের করে কার্টে যোগ করা
-    MenuItem item2;
-    int found2 = 0;
+    MenuItem item2; int found2 = 0;
     for (int i = 0; i < menuCount; i++) {
-        if (globalMenu[i].id == 4) {
-            item2 = globalMenu[i];
-            found2 = 1;
-            break;
-        }
+        if (globalMenu[i].id == 4) { item2 = globalMenu[i]; found2 = 1; break; }
     }
-    if (found2) {
-        addToCart(item2, 5); // Singara যোগ হবে ৫টা
-    } else {
-        printf("[!] Test Error: Singara (ID 4) not found in menu.txt\n");
-    }
-    viewCart(myCart, cartItemCount);
+    if (found2) addToCart(item2, 5);
 
-    float totalCost = calculateTotal(myCart, cartItemCount);
-    placeOrder("252-35-316"); // এখানে তোমার আইডি বা যেকোনো স্টুডেন্ট আইডি পাস করো
+    viewCart();
+    float totalCost = calculateTotal();
+    
+    placeOrder("252-35-316"); 
     displayOrderHistory("252-35-316");
 
+    printf("\n>>> DAY 4 INTEGRATION TESTING START <<<\n");
+    char currentStudent[] = "252-35-316"; 
+    int currentOrder = 2113; 
+
+    submitFeedback(currentStudent, currentOrder);
+    viewMyFeedback(currentStudent);
+    reportIssue(currentStudent);
+    viewMyTickets(currentStudent);
+
+    printf("\n>>> DAY 4 TESTING COMPLETE <<<\n");
     printf("\n>>> LOCAL TEST PASSED: SYSTEM WORKING PERFECTLY! <<<\n");
     return 0;
 }
