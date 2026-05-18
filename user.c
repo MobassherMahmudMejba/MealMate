@@ -2,71 +2,75 @@
 #include <string.h>
 #include "user.h"
 
-int registerUser(const char *id, const char *password, const char *name) {
-    FILE *file = fopen("data/users.txt", "r");
-    if (file != NULL) {
-        User u;
-        while (fscanf(file, "%[^|]|%[^|]|%[^|]|%f\n", u.studentId, u.password, u.name, &u.walletBalance) != EOF) {
-            if (strcmp(u.studentId, id) == 0) {
-                fclose(file);
-                return 0; 
+void registerUser(char* id, char* password, char* name) {
+    FILE *f = fopen("data/users.txt", "a+");
+    if (f != NULL) {
+        fprintf(f, "%s|%s|%s\n", id, password, name);
+        fclose(f);
+    }
+}
+
+void saveWallet(char* id, float balance) {
+    FILE *f = fopen("data/wallet.txt", "r");
+    char lines[100][100];
+    int count = 0;
+    char f_id[20];
+    float f_bal;
+    int found = 0;
+
+    if (f != NULL) {
+        char line[100];
+        while (fgets(line, sizeof(line), f)) {
+            if (sscanf(line, "%[^|]|%f", f_id, &f_bal) == 2) {
+                if (strcmp(f_id, id) == 0) {
+                    sprintf(lines[count++], "%s|%.2f\n", id, balance);
+                    found = 1;
+                } else {
+                    strcpy(lines[count++], line);
+                }
             }
         }
-        fclose(file);
+        fclose(f);
     }
-    file = fopen("data/users.txt", "a");
-    if (file == NULL) return -1; 
-    fprintf(file, "%s|%s|%s|0.00\n", id, password, name);
-    fclose(file);
-    return 1; 
+
+    if (!found) {
+        sprintf(lines[count++], "%s|%.2f\n", id, balance);
+    }
+
+    f = fopen("data/wallet.txt", "w");
+    if (f != NULL) {
+        for (int i = 0; i < count; i++) {
+            fputs(lines[i], f);
+        }
+        fclose(f);
+    }
 }
 
-int loginUser(const char *id, const char *password, User *loggedInUser) {
-    FILE *file = fopen("data/users.txt", "r");
-    if (file == NULL) return 0;
-    User u;
-    while (fscanf(file, "%[^|]|%[^|]|%[^|]|%f\n", u.studentId, u.password, u.name, &u.walletBalance) != EOF) {
-        if (strcmp(u.studentId, id) == 0 && strcmp(u.password, password) == 0) {
-            *loggedInUser = u;
-            fclose(file);
-            return 1; 
+float getWalletBalance(char* id) {
+    FILE *f = fopen("data/wallet.txt", "r");
+    if (f == NULL) return 0.0f;
+    char line[100], f_id[20];
+    float f_bal;
+    while (fgets(line, sizeof(line), f)) {
+        if (sscanf(line, "%[^|]|%f", f_id, &f_bal) == 2) {
+            if (strcmp(f_id, id) == 0) {
+                fclose(f);
+                return f_bal;
+            }
         }
     }
-    fclose(file);
-    return 0; 
-}
-
-float loadWallet(const char *id) {
-    FILE *file = fopen("data/users.txt", "r");
-    if (file == NULL) return 0.0f;
-    User u;
-    while (fscanf(file, "%[^|]|%[^|]|%[^|]|%f\n", u.studentId, u.password, u.name, &u.walletBalance) != EOF) {
-        if (strcmp(u.studentId, id) == 0) {
-            fclose(file);
-            return u.walletBalance;
-        }
-    }
-    fclose(file);
+    fclose(f);
     return 0.0f;
 }
 
-int saveWallet(const char *id, float newBalance) {
-    FILE *file = fopen("data/users.txt", "r");
-    if (file == NULL) return 0;
-    User users[100];
-    int count = 0;
-    while (fscanf(file, "%[^|]|%[^|]|%[^|]|%f\n", users[count].studentId, users[count].password, users[count].name, &users[count].walletBalance) != EOF) {
-        if (strcmp(users[count].studentId, id) == 0) {
-            users[count].walletBalance = newBalance;
-        }
-        count++;
-    }
-    fclose(file);
-    file = fopen("data/users.txt", "w");
-    if (file == NULL) return 0;
-    for (int i = 0; i < count; i++) {
-        fprintf(file, "%s|%s|%s|%.2f\n", users[i].studentId, users[i].password, users[i].name, users[i].walletBalance);
-    }
-    fclose(file);
-    return 1;
+int deductWalletBalance(char* id, float amount) {
+    float currentBal = getWalletBalance(id);
+    if (currentBal < amount) return 0; // Insufficient Balance
+    saveWallet(id, currentBal - amount);
+    return 1; // Successful Deduction
+}
+
+void addWalletFunds(char* id, float amount) {
+    float currentBal = getWalletBalance(id);
+    saveWallet(id, currentBal + amount);
 }

@@ -28,32 +28,37 @@ int main() {
     MenuItem globalMenu[50];
     int menuCount = loadMenu(globalMenu, 50);
 
-    // সেশন ট্র্যাকিংয়ের জন্য ডিফল্ট স্টুডেন্ট আইডি ও ওয়ালেট ইনিশিয়ালাইজেশন
     char currentStudent[] = "252-35-316"; 
     registerUser(currentStudent, "mejba123", "Mejba Mahmud");
-    saveWallet(currentStudent, 500.00); 
+    
+    // ???????? ??? ??? ?????? ??? ???? ??????????? ???? ??? ????????? ? ????
+    if (getWalletBalance(currentStudent) == 0.0f) {
+        saveWallet(currentStudent, 300.00); 
+    }
 
     int choice;
     while (1) {
         printf("\n=====================================================\n");
         printf("             CAMPUS MEALMATE DASHBOARD               \n");
         printf("         Logged in as Student ID: %s                 \n", currentStudent);
+        printf("         Current Wallet Balance: %.2f BDT            \n", getWalletBalance(currentStudent));
         printf("=====================================================\n");
         printf("[1] View Cafeteria Menu\n");
         printf("[2] Add Item to Cart\n");
-        printf("[3] View Cart & Checkout\n");
+        printf("[3] View Cart & Checkout (Payment)\n");
         printf("[4] View Order History\n");
         printf("[5] Submit Feedback for an Order\n");
         printf("[6] View My Submitted Feedback\n");
         printf("[7] Report an Issue (Support Ticket)\n");
         printf("[8] View My Support Tickets\n");
+        printf("[9] Wallet Management (Add Funds)\n");
         printf("[0] Exit Application\n");
         printf("-----------------------------------------------------\n");
         printf("Select an option: ");
         
         if (scanf("%d", &choice) != 1) {
             printf("[!] Invalid input format!\n");
-            getchar(); // Clear invalid token
+            getchar(); 
             continue;
         }
 
@@ -86,11 +91,19 @@ int main() {
                 float total = calculateTotal();
                 if (total > 0) {
                     char confirm;
-                    printf("Proceed to Place Order? (y/n): ");
-                    getchar(); // Clear buffer
+                    printf("Grand Total: %.2f BDT\n", total);
+                    printf("Your Wallet Balance: %.2f BDT\n", getWalletBalance(currentStudent));
+                    printf("Proceed to Place Order & Pay? (y/n): ");
+                    getchar(); 
                     scanf("%c", &confirm);
                     if (confirm == 'y' || confirm == 'Y') {
-                        placeOrder(currentStudent);
+                        // ?? WALLET CHECK & DEDUCTION GATEWAY
+                        if (deductWalletBalance(currentStudent, total)) {
+                            placeOrder(currentStudent);
+                        } else {
+                            printf("\n[!] TRANSACTION FAILED: Insufficient Balance!\n");
+                            printf("[*] Please select option [9] to load funds into your wallet.\n");
+                        }
                     } else {
                         printf("[*] Checkout canceled. Staging buffer preserved.\n");
                     }
@@ -122,12 +135,34 @@ int main() {
                 viewMyTickets(currentStudent);
                 break;
                 
+            case 9: {
+                printf("\n--- WALLET SUBSYSTEM ---\n");
+                printf("Current Balance: %.2f BDT\n", getWalletBalance(currentStudent));
+                printf("[1] Add Funds (Load Money)\n");
+                printf("[2] Back to Main Menu\n");
+                printf("Select sub-option: ");
+                int w_choice;
+                scanf("%d", &w_choice);
+                if (w_choice == 1) {
+                    float add_amount;
+                    printf("Enter amount to add (BDT): ");
+                    scanf("%f", &add_amount);
+                    if (add_amount > 0) {
+                        addWalletFunds(currentStudent, add_amount);
+                        printf("[?] %.2f BDT added successfully! New Balance: %.2f BDT\n", add_amount, getWalletBalance(currentStudent));
+                    } else {
+                        printf("[!] Invalid amount entry!\n");
+                    }
+                }
+                break;
+            }
+                
             case 0:
                 printf("\nClosing session. Thank you for using MealMate!\n");
                 return 0;
                 
             default:
-                printf("[!] Invalid choice! Please select between 0 and 8.\n");
+                printf("[!] Invalid choice! Please select between 0 and 9.\n");
         }
     }
     return 0;

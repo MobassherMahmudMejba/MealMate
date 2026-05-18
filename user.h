@@ -1,10 +1,11 @@
 #ifndef USER_H
 #define USER_H
-#include "structs.h"
 
-int registerUser(const char *id, const char *password, const char *name);
-int loginUser(const char *id, const char *password, User *loggedInUser);
-float loadWallet(const char *id);
-int saveWallet(const char *id, float newBalance);
+void registerUser(char* id, char* password, char* name);
+int loginUser(char* id, char* password);
+void saveWallet(char* id, float balance);
+float getWalletBalance(char* id);
+int deductWalletBalance(char* id, float amount);
+void addWalletFunds(char* id, float amount);
 
 #endif
