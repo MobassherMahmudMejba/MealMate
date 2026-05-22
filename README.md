@@ -10,7 +10,7 @@ Welcome to **MealMate** — a lightning-fast, highly modular, and fully persiste
 
 ---
 
-## 🔥 Key Features (The Flex)
+## 🔥 Key Features 
 
 * 🔐 **Role-Based Access Control (RBAC):** A secure dual-gateway system. Students can log in to order food, while Admins get a God-Mode dashboard to manage the entire ecosystem.
 * 💳 **Dynamic Wallet Subsystem:** Real-time transaction handling! Students can load funds into their digital wallets. The system verifies balances and deducts BDT instantly before confirming an order.
